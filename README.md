@@ -1,11 +1,8 @@
 bitrix-miniorm
 ==============
-
-Использовал этот класс для доступа к своим таблицам в своих модулях. Но сейчас с выходом 14го битрикса этот класс уже неактуален..
-
-Для работы с своими таблицами мы создаём класс-наследник моего абстрактного класса tablestpl:
-<pre>
-class kupons extends ktablestpl { 
+		<p>Использовал этот класс для доступа к своим таблицам в своих модулях. Но сейчас с выходом 14го битрикса этот класс уже неактуален..</p>
+<p>Для работы с своими таблицами мы создаём класс-наследник моего абстрактного класса tablestpl: </p>
+<code>class kupons extends ktablestpl { 
        var $tablename = "kupons"; 
        var $fields = array( 
        "ID"   =>  array( "TYPE" => "INT" ), 
@@ -14,35 +11,30 @@ class kupons extends ktablestpl {
        "SKIDKA"   =>  array( "TYPE" => "INT" ), 
    ); 
 };
-</pre>
-в $tablename мы указываем имя таблицы (Необязательно такое же как имя класса), а в массиве $fields описываем поля таблицы и их тип
+</code>
 
-Всё. теперь наш класс наследует следующие методы для работы с таблицой:
-    Add($arr)
-    GetList($order, $filter, $select, $group)
-    Update($id, $arr)
-    RemoveAll()
-    RemoveByID($id)
-    GetByID($id)
-    GetAll()
+<P>в $tablename мы указываем имя таблицы (Необязательно такое же как имя класса), а в массиве $fields описываем поля таблицы и их тип</P>
 
-Теперь с таблицой можно работать так:
-
-Добавление:
-$kupons = new kupons();
+<P>Всё. теперь наш класс наследует следующие методы для работы с таблицой: </P>
+<ul><li>Add($arr)</li><li>GetList($order, $filter, $select, $group)</li><li>Update($id, $arr)</li><li>RemoveAll()</li><li>RemoveByID($id)</li>
+<li>GetByID($id)</li><li>GetAll()</li>
+</ul>
+<P>Теперь с таблицой можно работать так:</P>
+<P>Добавление:</P>
+<code>$kupons = new kupons();
 $kupons->Add(array('CODE'=>'test123', 'SKIDKA'=>10));
 //+----+---------+---------+--------+
 //| ID | USER_ID | CODE    | SKIDKA |
 //+----+---------+---------+--------+
 //|  1 |       0 | test123 |     10 |
 //+----+---------+---------+--------+
-Удаление:
-$kupons->RemoveByID(2);
+</code>
 
-Выборка:
+<P>Удаление:</P>
+<code>$kupons->RemoveByID(2);</code>
 
-На примере заполненной базы покажу какие запросы в неё составляются этим классом:
-пример таблицы:
+<P>Выборка:</P><P>На примере заполненной базы покажу какие запросы в неё составляются этим классом:</P>
+<code>пример таблицы: 
 +----+---------+---------+--------+
 | ID | USER_ID | CODE    | SKIDKA |
 +----+---------+---------+--------+
@@ -53,9 +45,9 @@ $kupons->RemoveByID(2);
 |  5 |       6 | test    |     15 |
 |  6 |       7 | test    |     19 |
 |  7 |       7 |         |      0 |
-+----+---------+---------+--------+
++----+---------+---------+--------+</code>
 
-$kupons = new kupons();
+<textarea class='kudincode' readonly>$kupons = new kupons();
 $res = $kupons->GetList(array(), array('CODE'=>'test', '<SKIDKA'=>20));
 while($row = $res->Fetch()){	
 	var_dump($row);
@@ -86,17 +78,13 @@ array(4) {
   string(4) "test"
   ["SKIDKA"]=>
   string(2) "19"
-} 
-
-
-
-
-$kupons = new kupons();
+} </textarea>
+<textarea class='kudincode' readonly>$kupons = new kupons();
 $res = $kupons->GetList(array('SKIDKA'=>'ASC','ID'=>'DESC'), 
    array('USER_ID'=>array(5,6,9,10), 
-         '?CODE'=>array('test','%bb%'), 
-         '>SKIDKA'=>10,
-         '!SKIDKA'=>22),
+           '?CODE'=>array('test','%bb%'), 
+            '>SKIDKA'=>10,
+           '!SKIDKA'=>22),
    array('ID', 'CODE', 'SKIDKA'));
 
 while($row = $res->Fetch()){
@@ -106,8 +94,9 @@ while($row = $res->Fetch()){
 // формирует запрос:
 SELECT ID, CODE, SKIDKA FROM `kupons`
  WHERE (`USER_ID` IN ( "5","6","9","10")) 
-         AND ((`CODE` LIKE "test")  OR (`CODE` LIKE "%bb%")) 
-         AND (`SKIDKA` > "10") AND (`SKIDKA` != "22")
+AND ((`CODE` LIKE "test") 
+ OR (`CODE` LIKE "%bb%")) 
+AND (`SKIDKA` > "10") AND (`SKIDKA` != "22")
  ORDER BY `SKIDKA` ASC, `ID` DESC ;
  
 // результат: 
@@ -127,4 +116,4 @@ array(3) {
   string(5) "bbbbb"
   ["SKIDKA"]=>
   string(2) "50"
-}
+}</textarea>
