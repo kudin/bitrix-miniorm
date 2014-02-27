@@ -1,11 +1,5 @@
-<?php
+<?php 
 
-/*
-* Aбстактный класс с общими методами для доступа к своим таблицам
-* Aвтор - Александр Кудин
-* kudinsasha@gmail.com 
-*/
-                        
 abstract class ktablestpl{
 
     function Add($arr){
