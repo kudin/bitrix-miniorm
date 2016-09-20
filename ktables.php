@@ -147,5 +147,28 @@ VALUES
     function GetAll($arOrder = array("ID"=>"DESC")){
         return $this->GetList($arOrder, array());
     }
+     
+    function CreateTable() {
+        $query = "CREATE TABLE `" . $this->tablename . "` \n (`ID` INT(11) NOT NULL AUTO_INCREMENT, \n";
+        foreach ($this->fields as $fieldName => $fieldProps) {
+            if($fieldName == 'ID') {
+                continue;
+            }
+            if(!$fieldProps['MAX_SIZE']) { 
+                switch ($fieldProps['TYPE']) {
+                    case 'VARCHAR':
+                        $fieldProps['MAX_SIZE'] = 255;
+                        break; 
+                    case 'INT': 
+                        $fieldProps['MAX_SIZE'] = 4;
+                        break; 
+                }
+            }
+            $query = $query . " `" . $fieldName . "` " . $fieldProps['TYPE'] . "(" . $fieldProps['MAX_SIZE'] . "), \n";
+        }
+        $query = $query . " PRIMARY KEY(`ID`) );";
+        global $DB;
+        $DB->Query($query);
+    }
     
 }
