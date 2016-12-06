@@ -148,8 +148,8 @@ VALUES
         return $this->GetList($arOrder, array());
     }
      
-    function CreateTable() {
-        $query = "CREATE TABLE `" . $this->tablename . "` \n (`ID` INT(11) NOT NULL AUTO_INCREMENT, \n";
+   function CreateTable() {
+        $query = "CREATE TABLE IF NOT EXISTS `" . $this->tablename . "` \n (`ID` INT(11) NOT NULL AUTO_INCREMENT, \n";
         foreach ($this->fields as $fieldName => $fieldProps) {
             if($fieldName == 'ID') {
                 continue;
@@ -161,12 +161,19 @@ VALUES
                         break; 
                     case 'INT': 
                         $fieldProps['MAX_SIZE'] = 4;
-                        break; 
+                        break;  
+                    case 'DATETIME': 
+                        $fieldProps['MAX_SIZE'] = false;
+                        break;  
                 }
             }
-            $query = $query . " `" . $fieldName . "` " . $fieldProps['TYPE'] . "(" . $fieldProps['MAX_SIZE'] . "), \n";
+            $query = $query . " `" . $fieldName . "` " . $fieldProps['TYPE'];
+            if($fieldProps['MAX_SIZE']) {
+                $query = $query . "(" . $fieldProps['MAX_SIZE'] . ")" ; 
+            }
+            $query = $query . ", \n";
         }
-        $query = $query . " PRIMARY KEY(`ID`) );";
+        $query = $query . " PRIMARY KEY(`ID`) );"; 
         global $DB;
         $DB->Query($query);
     }
