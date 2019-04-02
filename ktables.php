@@ -1,28 +1,28 @@
-<?php 
+<?php
 
-abstract class ktablestpl{
 
+abstract class ktablestpl {
+    
     function Add($arr){
         global $DB;
         $insertArr['ID'] = 'NULL';
-        foreach ($this->fields as $fieldname => $fieldArr){
-            if($fieldname == 'ID')
+        foreach ($this->fields as $fieldname => $fieldArr) {
+            if($fieldname == 'ID') {
                 continue;
-            if($arr[$fieldname]){
+            }
+            if($arr[$fieldname]) {
                 $insertArr[$fieldname] = $DB->ForSql($arr[$fieldname]);
                 $norm = true;
             } else {
                 $insertArr[$fieldname] = '';
             }
         }
-
-        if(!$norm)
+        if(!$norm) {
             return false;
-        
-        $strSql = 'INSERT INTO `' . $this->tablename . '`
-(`' . implode('` , `', array_keys($insertArr)) . '`)
-VALUES
-(\'' . implode("','", $insertArr) . '\');';
+        }
+        $strSql = 'INSERT INTO `' . $this->tablename . '`(`' .
+                implode('` , `', array_keys($insertArr)) .
+                '`) VALUES (\'' . implode("','", $insertArr) . '\');';
           
         $DB->Query($strSql);
         return intval($DB->LastID());
@@ -30,12 +30,14 @@ VALUES
     
     function GetList($order, $filter, $select, $group){
         global $DB;
-        if (!$order)
-            $order = array('ID' => 'ASC');
+        if (!$order) {
+            $order = ['ID' => 'ASC'];
+        }
         foreach ($order as $k => $v) {
             $v = strtoupper($v) == 'ASC' ? $v : 'DESC';
-            if (in_array($k, array_keys($this->fields)))
+            if (in_array($k, array_keys($this->fields))) {
                 $o[] = '`' . $DB->ForSql($k) . '` ' . $v;
+            }
         }
         $order = implode(', ', $o);
         foreach ($filter as $k => $v) {
@@ -53,14 +55,15 @@ VALUES
                     $f[] = '`' . $k . '` = "' . $DB->ForSql($v) . '"';
                 }
             } else {
-                if(in_array($firstSymbol = substr($k, 0, 1), array('?', '!', '>', '<')) &&
-                   in_array($k_ = substr($k, 1), array_keys($this->fields))){
+                if(in_array($firstSymbol = substr($k, 0, 1), ['?', '!', '>', '<']) &&
+                   in_array($k_ = substr($k, 1), array_keys($this->fields))) {
                     switch (true) {
                         case $firstSymbol == '?':
                                 if (is_array($v)) {
-                                    $filTmp = array();
-                                    foreach ($filter[$k] as $id)
+                                    $filTmp = [];
+                                    foreach ($filter[$k] as $id) {
                                         $filTmp[] = '`' . $k_ . '` LIKE "' . $DB->ForSql($id) . '"';
+                                    }
                                     $f[] = '(' . implode(') OR (', $filTmp) . ')';
                                 } else {
                                     $f[] = '`' . $k_ . '` LIKE "' . $DB->ForSql($v) . '"';
@@ -79,19 +82,22 @@ VALUES
                 
             }
         }
-
-        if(!$f)
+        if(!$f) {
             $where = '1';
-        elseif(count($f) == 1)
+        }
+        elseif(count($f) == 1) {
             $where = "( {$f[0]} )";
-        elseif(count($f) > 1)
+        }
+        elseif(count($f) > 1) {
             $where = '(' . implode(') AND (', $f) . ')';
+        }
         
         if(!$select){
             $select = '*';
         } else {
-            if(!in_array('ID', $select))
+            if(!in_array('ID', $select)) {
                 $select[] = 'ID';
+            }
             $select = implode(', ', $select);
         }
         
@@ -102,9 +108,9 @@ VALUES
             $order = false;
         }
         
-        $strSql = 'SELECT ' . $select . ' FROM `' . $this->tablename . '`
-' . ($where ? ' WHERE ' . $where : '') . '
-' . ($order ? ' ORDER BY ' . $order : '') . ' ' . $group . ';';
+        $strSql = 'SELECT ' . $select . ' FROM `' . $this->tablename . '`' .
+                ($where ? ' WHERE ' . $where : '') .
+                ($order ? ' ORDER BY ' . $order : '') . ' ' . $group . ';';
             
         $rs = $DB->Query($strSql);
         return $rs;
@@ -112,15 +118,19 @@ VALUES
  
     public function Update($id, $arr) {
         $id = intval($id);
-        if (!$id || !$arr || !is_array($arr))
+        if (!$id || !$arr || !is_array($arr)) {
             return false;
+        }
         global $DB;
-        $f = array();
-        foreach ($arr as $k => $v)
-            if (in_array($k, array_keys($this->fields)))
+        $f = [];
+        foreach ($arr as $k => $v) {
+            if (in_array($k, array_keys($this->fields))) {
                 $f[] = '`' . $k . '` = "' . $DB->ForSql($v) . '" ';
-        if (!count($f))
+            }
+        }
+        if (!count($f)) {
             return false;
+        }
         $result = $DB->Query(' UPDATE `'. $this->tablename .
                              '` SET '. implode(',', $f) .
                              ' WHERE `ID` = '. $id .';');
@@ -134,22 +144,23 @@ VALUES
      
     function RemoveByID($id) {
         $id = intval($id);
-        if ($id <= 0)
+        if ($id <= 0) {
             return false;
+        }
         global $DB;
         $DB->Query("DELETE FROM `" . $this->tablename . "` WHERE `ID` = {$id}");
     }
     
     function GetByID($id){
-        return $this->GetList(array(), array('ID' => $id));
+        return $this->GetList([], ['ID' => $id]);
     }
      
-    function GetAll($arOrder = array("ID"=>"DESC")){
-        return $this->GetList($arOrder, array());
+    function GetAll($arOrder = ["ID" => "DESC"]){
+        return $this->GetList($arOrder, []);
     }
      
    function CreateTable() {
-        $query = "CREATE TABLE IF NOT EXISTS `" . $this->tablename . "` \n (`ID` INT(11) NOT NULL AUTO_INCREMENT, \n";
+        $query = "CREATE TABLE IF NOT EXISTS `" . $this->tablename . "` (`ID` INT(11) NOT NULL AUTO_INCREMENT, ";
         foreach ($this->fields as $fieldName => $fieldProps) {
             if($fieldName == 'ID') {
                 continue;
@@ -171,7 +182,7 @@ VALUES
             if($fieldProps['MAX_SIZE']) {
                 $query = $query . "(" . $fieldProps['MAX_SIZE'] . ")" ; 
             }
-            $query = $query . ", \n";
+            $query = $query . ", ";
         }
         $query = $query . " PRIMARY KEY(`ID`) );"; 
         global $DB;
